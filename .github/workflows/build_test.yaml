@@ -20,6 +20,7 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v44
         with:
+          sha: ${{ git ls-remote --tags --sort=committerdate | grep -o 'v.*' | sort -r | head -1 }}
           files_yaml: |
             full:
               - buildAll.txt
