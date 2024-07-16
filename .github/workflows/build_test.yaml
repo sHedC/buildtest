@@ -1,0 +1,35 @@
+name: "Build Test"
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  builder:
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with
+          files_yaml: |
+            full:
+              - buildAll.txt
+            partial:
+              - buildPartial.txt
+
+      - name: Full Build
+        if: steps.changed-files.outputs.full_any_changed == 'true'
+        run: echo 'Full Build'
+
+      - name: Partial Build
+        if: ${{ steps.changed-files.outputs.full_any_changed != 'true' && steps.changed-files.outputs.partial_any_changed == 'true' }}
+        run: echo 'Partial Build'
