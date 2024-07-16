@@ -35,27 +35,12 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v4
 
-      - name: "Changed Files"
-        id: "changed-files"
-        uses: tj-actions/changed-files@v44
-        with:
-          sha: ${{needs.latest_tag.outputs.value}}
-          files_yaml: |
-            full:
-              - buildAll.txt
-            part:
-              - buildPartial.txt
-
       - name: "Build Type"
         id: "build-type"
         run: |
-          BUILD_TYPE="NONE"
-          if [[ ${{steps.changed-files.outputs.full_any_changed == 'true'}} ]]; then
-            BUILD_TYPE="FULL"
-          elif [[ ${{steps.changed-files.outputs.part_any_changed == 'true'}} ]]; then
-            BUILD_TYPE="PART"
-          fi
+          git diff --name-only -r ${{needs.latest_tag.outputs.value}} HEAD
 
+          BUILD_TYPE="NONE"
           echo "value=$BUILD_TYPE" >> $GITHUB_OUTPUT
   
   full_build:
