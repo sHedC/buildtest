@@ -12,23 +12,76 @@ jobs:
   latest_tag:
     runs-on: ubuntu-22.04
     outputs:
-        value: ${{steps.get_tag.outputs.value}}
-
+        value: ${{steps.get-tag.outputs.value}}
     steps:
-      - name: Checkout Tags
+      - name: "Checkout Tags"
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Get Latest Tag
-        id: "get_tag"
+          
+      - name: "Get Latest Tag"
+        id: "get-tag"
         run: |
           LATEST_TAG=$(git tag --sort=taggerdate | tail -1)
           echo "value=$LATEST_TAG" >> $GITHUB_OUTPUT
 
-  build:
+  build_type:
     needs: latest_tag
     runs-on: ubuntu-22.04
-    steps:
-      - run: echo tag [${{needs.latest_tag.outputs.value}}]
+    outputs:
+      value: ${{steps.build-type.outputs.value}}
 
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v44
+
+      - name: "Changed Files"
+        id: "changed-files"
+        uses: tj-actions/changed-files@v44
+        with:
+          sha: ${{needs.latest_tag.outputs.value}}
+          files_yaml: |
+            full:
+              - buildAll.txt
+            part:
+              - buildPartial.txt
+
+      - name: "Build Type"
+        id: "build-type"
+        run: |
+          BUILD_TYPE="NONE"
+          if [[ ${{steps.changed-files.outputs.full_any_changed == 'true'}} ]]; then
+            BUILD_TYPE="FULL"
+          elif [[ ${{steps.changed-files.outputs.part_any_changed == 'true'}} ]]; then
+            BUILD_TYPE="PART"
+          fi
+
+          echo "value=$BUILD_TYPE" >> $GITHUB_OUTPUT
+  
+  full_build:
+    needs: build_type
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: "Full Build"
+        if: ${{needs.build_type.outputs.value}} == "FULL"
+        run: echo "Full Build"
+
+  part_build:
+    needs: build_type
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: "Part Build"
+        if: ${{needs.build_type.outputs.value}} == "PART"
+        run: echo "Part Build"
+
+
+  none_build:
+    needs: build_type
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: "None Build"
+        if: ${{needs.build_type.outputs.value}} == "NONE"
+        run: echo "Build Not Needed"
