@@ -27,7 +27,7 @@ jobs:
           echo "value=$LATEST_TAG" >> $GITHUB_OUTPUT
 
       - name: "Changed Files"
-        if: ${{steps.latest-tag.outputs.value == ''}}
+        if: ${{steps.latest-tag.outputs.value != ''}}
         id: "changed-files"
         uses: tj-actions/changed-files@v44
         with:
@@ -42,7 +42,8 @@ jobs:
         id: "build-type"
         run: |
           BUILD_TYPE="NONE"
-          if [[ -z ${{steps.latest-tag.outputs.value}} ]]; then
+          echo $steps.latest-tag.outputs.value
+          if [[ ${{-z steps.latest-tag.outputs.value}} ]]; then
             BUILD_TYPE="FULL"
           elif [[ ${{steps.changed-files.outputs.full_any_changed == 'true'}} ]]; then
             BUILD_TYPE="FULL"
