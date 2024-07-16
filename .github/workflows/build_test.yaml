@@ -42,9 +42,15 @@ jobs:
 
       - name: "test"
         env:
-          ALL_CHANGED_FILES: ${{steps.changed-files.outputs.test_all_changed_files}}        
+          FULL_CHANGED_FILES: ${{steps.changed-files.outputs.full_changed_files}}
+          PART_CHANGED_FILES: ${{steps.changed-files.outputs.part_changed_files}}    
         run: |
-          echo $ALL_CHANGED_FILES
+          for file in ${FULL_CHANGED_FILES}; do
+            echo "$file was changed"
+          done
+          for file in ${PART_CHANGED_FILES}; do
+            echo "$file was changed"
+          done
 
 
       - name: "Build Type"
