@@ -11,6 +11,9 @@ on:
 jobs:
   new_build_type:
     runs-on: ubuntu-22.04
+    outputs:
+      value: ${{steps.build-type.outputs.value}}
+
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
