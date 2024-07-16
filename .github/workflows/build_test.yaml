@@ -20,6 +20,9 @@ jobs:
       - name: "Changed Files"
         id: "changed-files"
         uses: tj-actions/changed-files@v44
+        with:
+          base_sha: HEAD
+          sha: v2024-07-16-1
 
       - name: "List Files"
         env:
