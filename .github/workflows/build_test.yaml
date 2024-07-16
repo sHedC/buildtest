@@ -9,8 +9,10 @@ on:
       - "main"
 
 jobs:
-  builder:
+  get_tags:
     runs-on: ubuntu-22.04
+    outputs:
+        value: ${{steps.get_tags.outputs.latest_tag}}
 
     steps:
       - name: Checkout Tags
@@ -19,7 +21,14 @@ jobs:
           fetch-depth: 0
 
       - name: Get Latest Tag
+        id: "get_tags"
         run: |
-          LATEST_TAG=$(git tag --sor=taggerdate | tail -1)
-          echo $LATEST_TAG
-          git checkout $LATEST_TAG
+          LATEST_TAG=$(git tag --sort=taggerdate | tail -1)
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+  build:
+    needs: get_tags
+    runs-on: ubuntu-22.04
+    steps:
+      - run: echo tag [${{needs.get_tags.outputs.latest_tag}}]
+
