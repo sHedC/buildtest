@@ -24,8 +24,7 @@ jobs:
         id: "get_tag"
         run: |
           LATEST_TAG=$(git tag --sort=taggerdate | tail -1)
-          echo $LATEST_TAG
-          echo "value"=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo "value=$LATEST_TAG" >> $GITHUB_OUTPUT
 
   build:
     needs: latest_tag
