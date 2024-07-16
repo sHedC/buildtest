@@ -42,7 +42,7 @@ jobs:
         id: "build-type"
         run: |
           BUILD_TYPE="NONE"
-          echo ${{steps.latest-tag.outputs.value}} == ''
+          echo $(${{steps.latest-tag.outputs.value}} == '')
           if [[ ${{steps.latest-tag.outputs.value == ''}} ]]; then
             BUILD_TYPE="FULL"
           elif [[ ${{steps.changed-files.outputs.full_any_changed == 'true'}} ]]; then
