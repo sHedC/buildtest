@@ -28,7 +28,9 @@ jobs:
 
       - name: Full Build
         if: steps.changed-files.outputs.full_any_changed == 'true'
-        run: echo 'Full Build'
+        run: |
+          echo 'Full Build'
+          exit 1
 
       - name: Partial Build
         if: ${{ steps.changed-files.outputs.full_any_changed != 'true' && steps.changed-files.outputs.partial_any_changed == 'true' }}
