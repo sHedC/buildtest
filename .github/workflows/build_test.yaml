@@ -31,6 +31,7 @@ jobs:
         id: "changed-files"
         uses: tj-actions/changed-files@v44
         with:
+          base_sha: HEAD
           sha: ${{steps.latest-tag.outputs.value}}
           files_yaml: |
             full:
@@ -46,8 +47,6 @@ jobs:
           for file in ${ALL_CHANGED_FILES}; do
             echo "$file was changed"
           done
-
-          echo ${steps.changed-files.outputs.all_changed_files}
 
           BUILD_TYPE="NONE"
           if [[ ${steps.latest-tag.outputs.value} == '' ]]; then
