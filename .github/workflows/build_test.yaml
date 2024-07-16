@@ -12,7 +12,7 @@ jobs:
   get_tags:
     runs-on: ubuntu-22.04
     outputs:
-        value: ${{steps.get_tags.outputs.latest_tag}}
+        tag: ${{steps.get_tags.outputs.latest_tag}}
 
     steps:
       - name: Checkout Tags
@@ -24,11 +24,12 @@ jobs:
         id: "get_tags"
         run: |
           LATEST_TAG=$(git tag --sort=taggerdate | tail -1)
-          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+          echo $LATEST_TAG
+          echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
 
   build:
     needs: get_tags
     runs-on: ubuntu-22.04
     steps:
-      - run: echo tag [${{needs.get_tags.outputs.latest_tag}}]
+      - run: echo tag [${{needs.get_tags.outputs.tag}}]
 
