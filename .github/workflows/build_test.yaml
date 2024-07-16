@@ -46,13 +46,18 @@ jobs:
           for file in ${ALL_CHANGED_FILES}; do
             echo "$file was changed"
           done
-          
+
+          echo ${steps.changed-files.outputs.all_changed_files}
+
           BUILD_TYPE="NONE"
-          if [[ '${{steps.latest-tag.outputs.value}}' == '' ]]; then
+          if [[ ${steps.latest-tag.outputs.value} == '' ]]; then
+            echo No Tag
             BUILD_TYPE="FULL"
-          elif [[ '${{steps.changed-files.outputs.full_any_changed}}' == 'true' ]]; then
+          elif [[ ${steps.changed-files.outputs.full_any_changed} == 'true' ]]; then
+            echo Full
             BUILD_TYPE="FULL"
-          elif [[ '${{steps.changed-files.outputs.part_any_changed}}' == 'true' ]]; then
+          elif [[ ${steps.changed-files.outputs.part_any_changed} == 'true' ]]; then
+            echo Partial
             BUILD_TYPE="PART"
           fi
           echo $BUILD_TYPE
