@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: "Full Build"
-        if: ${{needs.build_type.outputs.value == "FULL"}}
+        if: ${{needs.build_type.outputs.value == 'FULL'}}
         run: echo "Full Build"
 
   part_build:
@@ -63,7 +63,7 @@ jobs:
 
     steps:
       - name: "Part Build"
-        if: ${{needs.build_type.outputs.value == "PART"}}
+        if: ${{needs.build_type.outputs.value == 'PART'}}
         run: echo "Part Build"
 
 
@@ -73,5 +73,5 @@ jobs:
 
     steps:
       - name: "None Build"
-        if: ${{needs.build_type.outputs.value == "NONE"}}
+        if: ${{needs.build_type.outputs.value == 'NONE'}}
         run: echo "Build Not Needed"
