@@ -31,7 +31,6 @@ jobs:
         id: "changed-files"
         uses: tj-actions/changed-files@v44
         with:
-          base_sha: HEAD
           sha: ${{steps.latest-tag.outputs.value}}
           files_yaml: |
             full:
@@ -39,17 +38,19 @@ jobs:
             part:
               - buildPartial.txt
 
-      - name: "Build Type"
-        id: "build-type"
+
+      - name: "test"
         env:
-          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}        
+          ALL_CHANGED_FILES: ${{steps.changed-files.outputs.all_changed_files}}        
         run: |
           for file in ${ALL_CHANGED_FILES}; do
             echo "$file was changed"
           done
 
-          echo ${{steps.changed-files.outputs.all_changed_files}}
 
+      - name: "Build Type"
+        id: "build-type"
+        run: |
           BUILD_TYPE="NONE"
           if [[ ${{steps.latest-tag.outputs.value}} == '' ]]; then
             echo No Tag
