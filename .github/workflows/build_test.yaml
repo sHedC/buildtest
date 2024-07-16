@@ -43,7 +43,7 @@ jobs:
         run: |
           BUILD_TYPE="NONE"
           echo $steps.latest-tag.outputs.value
-          if [[ ${{-z steps.latest-tag.outputs.value}} ]]; then
+          if [[ ${{steps.latest-tag.outputs.value == ''}} ]]; then
             BUILD_TYPE="FULL"
           elif [[ ${{steps.changed-files.outputs.full_any_changed == 'true'}} ]]; then
             BUILD_TYPE="FULL"
