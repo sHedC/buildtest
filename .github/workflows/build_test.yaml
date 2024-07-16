@@ -42,6 +42,23 @@ jobs:
             echo "$file was changed"
           done
 
+      - name: "Build Type"
+        id: "build-type"
+        run: |
+          BUILD_TYPE="NONE"
+          if [[ ${{steps.latest-tag.outputs.value}} == '' ]]; then
+            echo No Tag
+            BUILD_TYPE="FULL"
+          elif [[ ${{steps.changed-files.outputs.full_any_changed}} == 'true' ]]; then
+            echo Full
+            BUILD_TYPE="FULL"
+          elif [[ ${{steps.changed-files.outputs.part_any_changed}} == 'true' ]]; then
+            echo Partial
+            BUILD_TYPE="PART"
+          fi
+          echo $BUILD_TYPE
+          echo "value=$BUILD_TYPE" >> $GITHUB_OUTPUT
+          
   build_type:
     runs-on: ubuntu-22.04
     outputs:
