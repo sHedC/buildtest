@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: actions/checkout@v44
+        uses: actions/checkout@v4
 
       - name: "Changed Files"
         id: "changed-files"
