@@ -9,24 +9,7 @@ on:
       - "main"
 
 jobs:
-  latest_tag:
-    runs-on: ubuntu-22.04
-    outputs:
-        value: ${{steps.get-tag.outputs.value}}
-    steps:
-      - name: "Checkout Tags"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          
-      - name: "Get Latest Tag"
-        id: "get-tag"
-        run: |
-          LATEST_TAG=$(git tag --sort=taggerdate | tail -1)
-          echo "value=$LATEST_TAG" >> $GITHUB_OUTPUT
-
   build_type:
-    needs: latest_tag
     runs-on: ubuntu-22.04
     outputs:
       value: ${{steps.build-type.outputs.value}}
@@ -40,12 +23,18 @@ jobs:
       - name: "Build Type"
         id: "build-type"
         run: |
-          CHNAGES=$(git diff --name-only -r ${{needs.latest_tag.outputs.value}} HEAD | xargs)
-          for file in $CHANGES; do
-            echo "$file was changed"
-          done
-
           BUILD_TYPE="NONE"
+          LATEST_TAG=$(git tag --sort=taggerdate | tail -1)
+
+          if [[ -z $LATEST_TAG ]]; then
+            BUILD_TYPE="FULL"
+          else
+            CHANGES=$(git diff --name-only -r $LATEST_TAG HEAD | xargs)
+            for file in $CHANGES; do
+              echo "$file was changed"
+            done
+          fi
+          
           echo "value=$BUILD_TYPE" >> $GITHUB_OUTPUT
   
   full_build:
