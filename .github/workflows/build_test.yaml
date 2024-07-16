@@ -42,7 +42,6 @@ jobs:
         id: "build-type"
         run: |
           BUILD_TYPE="NONE"
-          echo $steps.latest-tag.outputs.value
           if [[ ${{steps.latest-tag.outputs.value == ''}} ]]; then
             BUILD_TYPE="FULL"
           elif [[ ${{steps.changed-files.outputs.full_any_changed == 'true'}} ]]; then
@@ -50,6 +49,7 @@ jobs:
           elif [[ ${{steps.changed-files.outputs.part_any_changed == 'true'}} ]]; then
             BUILD_TYPE="PART"
           fi
+          echo $BUILD_TYPE
           echo "value=$BUILD_TYPE" >> $GITHUB_OUTPUT
 
   full_build:
