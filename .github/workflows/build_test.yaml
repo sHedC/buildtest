@@ -9,7 +9,24 @@ on:
       - "main"
 
 jobs:
+  latest_tag:
+    runs-on: ubuntu-22.04
+    outputs:
+        value: ${{steps.get-tag.outputs.value}}
+    steps:
+      - name: "Checkout Tags"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: "Get Latest Tag"
+        id: "get-tag"
+        run: |
+          LATEST_TAG=$(git tag --sort=taggerdate | tail -1)
+          echo "value=$LATEST_TAG" >> $GITHUB_OUTPUT
+
   build_type:
+    needs: latest_tag
     runs-on: ubuntu-22.04
     outputs:
       value: ${{steps.build-type.outputs.value}}
@@ -20,22 +37,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "Build Type"
-        id: "build-type"
-        run: |
-          BUILD_TYPE="NONE"
-          LATEST_TAG=$(git tag --sort=taggerdate | tail -1)
-
-          if [[ -z $LATEST_TAG ]]; then
-            BUILD_TYPE="FULL"
-          else
-            CHANGES=$(git diff --name-only -r $LATEST_TAG HEAD | xargs)
-            for file in $CHANGES; do
-              echo "$file was changed"
-            done
-          fi
-          
-          echo "value=$BUILD_TYPE" >> $GITHUB_OUTPUT
+      - name: "Changed Files"
+        id: "changed-files"
+        uses: tj-actions/changed-files@v44
+        with:
+          sha: ${{needs.latest_tag.outputs.value}}
+          files_yaml: |
+            full:
+              - buildAll.txt
+            part:
+              - buildPartial.txt
   
   full_build:
     needs: build_type
