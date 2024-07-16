@@ -19,7 +19,7 @@ jobs:
       - name: Get Changed Files
         id: changed-files
         uses: tj-actions/changed-files@v44
-        with
+        with:
           files_yaml: |
             full:
               - buildAll.txt
