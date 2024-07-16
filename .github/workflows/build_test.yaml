@@ -20,5 +20,6 @@ jobs:
 
       - name: Get Latest Tag
         run: |
-          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          LATEST_TAG=$(git tag --sor=taggerdate | tail -1)
           echo $LATEST_TAG
+          git checkout $LATEST_TAG
