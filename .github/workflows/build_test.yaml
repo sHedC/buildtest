@@ -33,11 +33,6 @@ jobs:
         with:
           base_sha: HEAD
           sha: ${{steps.latest-tag.outputs.value}}
-          files_yaml: |
-            full:
-              - buildAll.txt
-            part:
-              - buildPartial.txt
 
       - name: "List Files"
         env:
