@@ -40,7 +40,10 @@ jobs:
       - name: "Build Type"
         id: "build-type"
         run: |
-          git diff --name-only -r ${{needs.latest_tag.outputs.value}} HEAD
+          CHNAGES=$(git diff --name-only -r ${{needs.latest_tag.outputs.value}} HEAD | xargs)
+          for file in $CHANGES; do
+            echo "$file was changed"
+          done
 
           BUILD_TYPE="NONE"
           echo "value=$BUILD_TYPE" >> $GITHUB_OUTPUT
@@ -51,7 +54,7 @@ jobs:
 
     steps:
       - name: "Full Build"
-        if: ${{needs.build_type.outputs.value}} == "FULL"
+        if: ${{needs.build_type.outputs.value == "FULL"}}
         run: echo "Full Build"
 
   part_build:
@@ -60,7 +63,7 @@ jobs:
 
     steps:
       - name: "Part Build"
-        if: ${{needs.build_type.outputs.value}} == "PART"
+        if: ${{needs.build_type.outputs.value == "PART"}}
         run: echo "Part Build"
 
 
@@ -70,5 +73,5 @@ jobs:
 
     steps:
       - name: "None Build"
-        if: ${{needs.build_type.outputs.value}} == "NONE"
+        if: ${{needs.build_type.outputs.value == "NONE"}}
         run: echo "Build Not Needed"
