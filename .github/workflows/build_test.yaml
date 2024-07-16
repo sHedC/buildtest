@@ -44,7 +44,7 @@ jobs:
         env:
           ALL_CHANGED_FILES: ${{steps.changed-files.outputs.test_all_changed_files}}        
         run: |
-          echo ${ALL_CHANGED_FILES}
+          echo $ALL_CHANGED_FILES
 
 
       - name: "Build Type"
