@@ -117,7 +117,12 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: gh release edit "${{ needs.release.outputs.tag }}" --draft=false
 
-      - name: Cleanup Drafts
+  cleanup:
+    name: Cleanup Draft Releases
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cleanup 
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
