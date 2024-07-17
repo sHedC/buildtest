@@ -126,6 +126,6 @@ jobs:
           echo "$draft_releases" | jq '.tagName' | while read -r tag; do
             if [[ "$tag" != "" ]]; then
               echo "Deleting $tag"
-              gh release delete "$(echo $tag)" -y
+              gh release delete "test" -y
             fi
           done
