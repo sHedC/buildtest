@@ -63,7 +63,7 @@ jobs:
           echo "build=$SHOULD_BUILD" >> $GITHUB_OUTPUT
 
   release:
-    name: Create GitHub Release
+    name: Create Release
     needs: prepare
     if: needs.prepare.outputs.should_build == 'true'
     runs-on: ubuntu-latest
@@ -117,11 +117,6 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: gh release edit "${{ needs.release.outputs.tag }}" --draft=false
 
-  cleanup:
-    name: Cleanup Draft Releases
-    needs: publish
-    runs-on: ubuntu-latest
-    steps:
       - name: Cleanup 
         env:
           GH_TOKEN: ${{ github.token }}
@@ -129,5 +124,7 @@ jobs:
         run: |
           draft_releases=$(gh release list  --json tagName,createdAt,isDraft --jq '.[] | select(.isDraft)')
           echo "$draft_releases" | jq '.tagName' | while read -r tag; do 
-            gh release delete "$tag" -y
+            if [[ ! $(gh release view "$tag") == "release not found" ]]; then
+              gh release delete "$tag" -y
+            fi
           done
