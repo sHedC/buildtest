@@ -102,19 +102,10 @@ jobs:
     uses: ./.github/workflows/zwift_full_build.yaml
 
   part_build:
-    name: Incremental Docker
+    name: Update Docker
     needs: [prepare, release]
     if: needs.prepare.outputs.build_type == 'Incremental'
-    runs-on: ubuntu-latest
-    outputs:
-      success: ${{ steps.build.outputs.success }}
-    steps:
-      - name: Build
-        id: build
-        run: |
-          echo "Incremental Docker Update"
-          success='true'
-          echo "success=$success" >> $GITHUB_OUTPUT
+    uses: ./.github/workflows/zwift_part_build.yaml
 
   publish:
     name: Publish Release

@@ -1,0 +1,21 @@
+name: Incremental Docker Build
+
+on:
+  workflow_call:
+    outputs:
+      success:
+        description: Success Status of Build
+        value: ${{ jobs.update.outputs.success }}
+
+jobs:
+  build:
+    name: Update Docker
+    runs-on: ubuntu-latest
+    outputs:
+      success: ${{ steps.build.outputs.success }}
+    steps:
+      - name: Update
+        id: update
+        run: |
+          success='true'
+          echo "success=$success" >> $GITHUB_OUTPUT
