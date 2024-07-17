@@ -85,15 +85,10 @@ jobs:
     permissions: write-all
     runs-on: ubuntu-22.04
     needs: [part_build, full_build]
-    if: |
-      always()
-      && contains(needs.*.result, 'success')
-      && !contains(needs.*.result, 'faillure')
+    if: contains(needs.part_build.result, 'success') || contains(needs.full_build, 'success')
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: "Create Release"
         env:
@@ -101,5 +96,5 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           echo "Tagging Release."
-          tag=v$(date +%Y%m%d.%H%M%S)
+          tag=v$(date +%Y-%m-%d.%H-%M-%S)
           gh release create "$tag" --title "$tag" --generate-notes
