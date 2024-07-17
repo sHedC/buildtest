@@ -102,7 +102,7 @@ jobs:
 
   part_build:
     name: Incremental Docker
-    needs: [parepare, release]
+    needs: [prepare, release]
     if: needs.prepare.outputs.build_type == 'Incremental'
     runs-on: ubuntu-latest
     steps:
