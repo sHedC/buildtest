@@ -99,17 +99,8 @@ jobs:
     name: Rebuild Docker
     needs: [prepare, release]
     if: needs.prepare.outputs.build_type == 'Rebuild'
-    runs-on: ubuntu-latest
-    outputs:
-      success: ${{ steps.build.outputs.success }}
-    steps:
-      - name: Build
-        id: build
-        run: |
-          echo "Rebuild Docker"
-          success='true'
-          echo "success=$success" >> $GITHUB_OUTPUT
-
+    uses: ./.github/workflows/zwift_full_build.yaml
+    
   part_build:
     name: Incremental Docker
     needs: [prepare, release]
