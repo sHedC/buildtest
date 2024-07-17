@@ -111,11 +111,6 @@ jobs:
       (needs.part_build.outputs.success == 'true' || needs.full_build.outputs.success == 'true')
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch_depth: 0
-          
       - name: Publish Release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -123,12 +118,7 @@ jobs:
         run: gh release edit "${{ needs.release.outputs.tag }}" --draft=false
 
       - name: Cleanup 
+        uses: hugo19941994/delete-draft-releases@v1.0.0
         env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          draft_releases=$(gh release list  --json tagName,createdAt,isDraft --jq '.[] | select(.isDraft)')
-          echo "$draft_releases" | jq '.tagName' | while read -r tag; do
-            echo "Deleting $tag"
-            gh release delete $tag -y
-          done
+          GITHUB_TOKEN: ${{ github.token }}
+  
