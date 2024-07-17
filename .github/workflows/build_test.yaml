@@ -83,7 +83,6 @@ jobs:
   generate_release:
     needs: [part_build, full_build]
     runs-on: ubuntu-22.04
-    if: ${{needs.build_type.outputs.value != 'NONE'}}
     steps:
       - name: "Create Release"
         run: |
