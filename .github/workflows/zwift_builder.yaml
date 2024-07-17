@@ -123,8 +123,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           draft_releases=$(gh release list  --json tagName,createdAt,isDraft --jq '.[] | select(.isDraft)')
-          echo "$draft_releases" | jq '.tagName' | while read -r tag; do 
-            if [[ ! $(gh release view "$tag") == "release not found" ]]; then
-              gh release delete "$tag" -y
-            fi
+          echo "$draft_releases" | jq '.tagName' | while read -r tag; do
+            echo "Deleting $tag"
+            gh release delete $tag -y
           done
