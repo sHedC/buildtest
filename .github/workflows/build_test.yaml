@@ -137,11 +137,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: gh release edit "${{ needs.release.outputs.tag }}" --draft=false
-      
-      - name: Cleanup
-        uses: sgpublic/delete-release-action@v1.1
-        with:
-          draft-drop: true
-          draft-drop-count: -1
+
+  cleanup:
+    name: Cleanup On Fail
+    needs: [release, full_build, part_build]
+    if: |
+      always() &&
+      contains(needs.*.result, 'failure')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Draft
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release delete "${{ needs.release.outputs.tag }}" -y
