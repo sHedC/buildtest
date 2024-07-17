@@ -89,7 +89,7 @@ jobs:
           last_tag="${{ needs.prepare.outputs.last_tag }}"
           tag="${{ steps.tag.outputs.tag }}"
           type="${{ needs.prepare.outputs.build_type }}"
-          gh release create --draft "$tag" --title "$type" --generate-notes --notes-start-tag $last_tag
+          gh release create --draft "$tag" --title "$type ($tag)" --generate-notes --notes-start-tag $last_tag
 
   full_build:
     name: Rebuild Docker
