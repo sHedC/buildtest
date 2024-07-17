@@ -92,13 +92,13 @@ jobs:
           gh release create --draft "$tag" --title "$type" --generate-notes --notes-start-tag $last_tag
 
   full_build:
-    name: Docker
+    name: Rebuild Docker
     needs: [prepare, release]
     if: needs.prepare.outputs.build_type == 'Rebuild'
     uses: ./.github/workflows/zwift_full_build.yaml
 
   part_build:
-    name: Docker
+    name: Update Docker
     needs: [prepare, release]
     if: needs.prepare.outputs.build_type == 'Incremental'
     uses: ./.github/workflows/zwift_part_build.yaml
