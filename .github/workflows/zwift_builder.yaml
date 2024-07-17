@@ -10,10 +10,13 @@ on:
 
 permissions: write-all
 
+env:
+  RUNNER: ubuntu-latest
+
 jobs:
   prepare:
     name: Check If Build Is Needed
-    runs-on: ubuntu-latest
+    runs-on: RUNNER
     outputs:
       last_tag: ${{ steps.latest_tag.outputs.value }}
       should_build: ${{ steps.check_commit.outputs.build }}
