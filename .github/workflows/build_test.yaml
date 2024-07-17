@@ -124,7 +124,7 @@ jobs:
   publish:
     name: Publish Release
     needs: [release, full_build, part_build]
-    if: contains(needs.part_build.result, 'success') || contains(needs.full_build, 'success')
+    if: contains(needs.part_build.result, 'success') || contains(needs.full_build.result, 'success')
     runs-on: ubuntu-latest
     steps:
       - name: Publish Release
