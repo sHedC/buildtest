@@ -27,7 +27,7 @@ jobs:
       - name: Get Latest Tag
         id: latest_tag
         run: |
-          LATEST_TAG=$(git tag --sort=taggerdate | tail -1)
+          LATEST_TAG=$(git tag --sort -v:creatordate | grep v | tail -1)
           echo "value=$LATEST_TAG" >> $GITHUB_OUTPUT
 
       - name: Get Changes
@@ -79,7 +79,7 @@ jobs:
       - name: Set tag name
         id: tag
         run: |
-          tag=v$(date +%Y-%m-%d.%H-%M-%S)
+          tag=v$(date +%Y-%m-%d %H:%M:%S)
           echo "tag=$tag" >> $GITHUB_OUTPUT
 
       - name: Create Release
