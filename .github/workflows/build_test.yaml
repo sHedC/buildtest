@@ -97,20 +97,30 @@ jobs:
     needs: [prepare, release]
     if: needs.prepare.outputs.build_type == 'Rebuild'
     runs-on: ubuntu-latest
+    outputs:
+      success: ${{ steps.build.outputs.success }}
     steps:
       - name: Build
+        id: build
         run: |
           echo "Rebuild Docker"
+          success='true'
+          echo "success=$success" >> $GITHUB_OUTPUT
 
   part_build:
     name: Incremental Docker
     needs: [prepare, release]
     if: needs.prepare.outputs.build_type == 'Incremental'
     runs-on: ubuntu-latest
+    outputs:
+      success: ${{ steps.build.outputs.success }}
     steps:
       - name: Build
+        id: build
         run: |
           echo "Incremental Docker Update"
+          success='true'
+          echo "success=$success" >> $GITHUB_OUTPUT
 
   no_build:
     name: No Build Required
@@ -119,12 +129,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Nothing to Do"
-        run: echo "Build Not Needed"
+        run: |
+          echo "Build Not Needed"
 
   publish:
     name: Publish Release
     needs: [release, full_build, part_build]
-    if: contains(needs.part_build.result, 'success') || contains(needs.full_build.result, 'success')
+    if: needs.part_build.outputs.success == 'true' || needs.full_build.outputs.success == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Publish Release
