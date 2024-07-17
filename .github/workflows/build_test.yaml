@@ -135,7 +135,9 @@ jobs:
   publish:
     name: Publish Release
     needs: [release, full_build, part_build]
-    if: needs.part_build.outputs.success == 'true' || needs.full_build.outputs.success == 'true'
+    if: |
+      always() &&
+      (needs.part_build.outputs.success == 'true' || needs.full_build.outputs.success == 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Publish Release
