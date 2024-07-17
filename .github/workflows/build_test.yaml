@@ -1,34 +1,36 @@
-name: "Build Test"
+name: Build Test
 
 on:
   push:
     branches:
-      - "main"
+      - 'main'
   pull_request:
     branches:
-      - "main"
+      - 'main'
 
 jobs:
-  build_type:
-    runs-on: ubuntu-22.04
+  prepare:
+    name: Check If Build Is Needed
+    runs-on: ubuntu-latest
     outputs:
-      value: ${{steps.build-type.outputs.value}}
+      should_build: ${{ steps.check_commit.outputs.build }}
+      build_type: ${{ steps.check_commit.outputs.build_type }}
 
     steps:
-      - name: "Checkout"
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: "Latest Tag"
-        id: "latest-tag"
+      - name: Get Latest Tag
+        id: latest_tag
         run: |
           LATEST_TAG=$(git tag --sort=taggerdate | tail -1)
           echo "value=$LATEST_TAG" >> $GITHUB_OUTPUT
 
-      - name: "Changed Files"
-        if: ${{steps.latest-tag.outputs.value != ''}}
-        id: "changed-files"
+      - name: Get Changes
+        if: ${{steps.latest_tag.outputs.value != ''}}
+        id: changes
         uses: tj-actions/changed-files@v44
         with:
           base_sha: HEAD
@@ -39,62 +41,100 @@ jobs:
             part:
               - buildPartial.txt
 
-      - name: "Build Type"
-        id: "build-type"
+      - name: Check Build Type
+        id: check_commit
         run: |
-          BUILD_TYPE="NONE"
+          BUILD_TYPE='None'
+          SHOULD_BUILD='false'
+
           if [[ ${{steps.latest-tag.outputs.value}} == '' ]]; then
-            echo No Tag
-            BUILD_TYPE="FULL"
+            BUILD_TYPE='Rebuild'
+            SHOULD_BUILD='true'
           elif [[ ${{steps.changed-files.outputs.full_any_changed}} == 'true' ]]; then
-            echo Full
-            BUILD_TYPE="FULL"
+            BUILD_TYPE='Rebuild'
+            SHOULD_BUILD='true'
           elif [[ ${{steps.changed-files.outputs.part_any_changed}} == 'true' ]]; then
-            echo Partial
-            BUILD_TYPE="PART"
+            BUILD_TYPE='Incremental'
+            SHOULD_BUILD='true'
           fi
-          echo $BUILD_TYPE
-          echo "value=$BUILD_TYPE" >> $GITHUB_OUTPUT
 
-  full_build:
-    runs-on: ubuntu-22.04
-    needs: build_type
-    if: ${{needs.build_type.outputs.value == 'FULL'}}
+          echo "build_type=$BUILD_TYPE" >> $GITHUB_OUTPUT
+          echo "build=$SHOULD_BUILD" >> $GITHUB_OUTPUT
+
+  release:
+    name: "Create GitHub Release"
+    needs: prepare
+    if: needs.prepare.outputs.should_build == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
-      - name: "Full Build"
-        run: echo "Full Build"
+      - name: Checkout
+        uses: actions/checkout@v44
+        with:
+          fetch-depth: 0
 
-  part_build:
-    runs-on: ubuntu-22.04
-    needs: build_type
-    if: ${{needs.build_type.outputs.value == 'PART'}}
-    steps:
-      - name: "Partial Build"
-        run: echo "Part Build"
+      - name: Set tag name
+        id: tag
+        run: |
+          tag=v$(date +%Y-%m-%d.%H-%M-%S)
+          echo "tag=$tag" >> $GITHUB_OUTPUT
 
-  build_not_required:
-    runs-on: ubuntu-22.04
-    needs: build_type
-    if: ${{needs.build_type.outputs.value == 'NONE'}}
-    steps:
-      - name: "Nothing to Do"
-        run: echo "Build Not Needed"
-
-  generate_release:
-    name: "Generate Release"
-    permissions: write-all
-    runs-on: ubuntu-22.04
-    needs: [part_build, full_build]
-    if: contains(needs.part_build.result, 'success') || contains(needs.full_build, 'success')
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v4
-
-      - name: "Create Release"
+      - name: Create Release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          echo "Tagging Release."
-          tag=v$(date +%Y-%m-%d.%H-%M-%S)
-          gh release create "$tag" --title "$tag" --generate-notes
+          tag="${{ steps.tag.outputs.tag }}"
+          type="${{ needs.prepare.outputs.build_type }}""
+          gh release create --draft "$tag" --title "$tag - $type" --generate-notes
+
+
+  full_build:
+    name: Rebuild Docker
+    needs: [prepare, release]
+    if: needs.prepare.outputs.build_type == 'Rebuild'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        run: |
+          echo "Rebuild Docker"
+
+  part_build:
+    name: Incremental Docker
+    needs: [parepare, release]
+    if: needs.prepare.outputs.build_type == 'Incremental'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build
+        run: |
+          echo "Incremental Docker Update"
+
+  no_build:
+    name: No Build Required
+    needs: prepare
+    if: needs.prepare.outputs.build_type == 'None'
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Nothing to Do"
+        run: echo "Build Not Needed"
+
+  publish:
+    name: Publish Release
+    needs: [release, full_build, part_build]
+    if: contains(needs.part_build.result, 'success') || contains(needs.full_build, 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh release edit "${{ needs.release.outputs.tag }}" --draft=false
+      
+      - name: Cleanup
+        uses: eregon/keep-last-n-releases@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          n: 3
+          remove_tags_without_release: true
