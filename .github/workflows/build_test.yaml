@@ -79,7 +79,7 @@ jobs:
       - name: Set tag name
         id: tag
         run: |
-          tag=v$(date +%Y-%m-%d %H:%M:%S)
+          tag=v$(date +%Y-%m-%d.%H%M%S)
           echo "tag=$tag" >> $GITHUB_OUTPUT
 
       - name: Create Release
