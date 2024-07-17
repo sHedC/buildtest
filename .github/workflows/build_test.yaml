@@ -122,16 +122,6 @@ jobs:
           success='true'
           echo "success=$success" >> $GITHUB_OUTPUT
 
-  no_build:
-    name: No Build Required
-    needs: prepare
-    if: needs.prepare.outputs.build_type == 'None'
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Nothing to Do"
-        run: |
-          echo "Build Not Needed"
-
   publish:
     name: Publish Release
     needs: [release, full_build, part_build]
