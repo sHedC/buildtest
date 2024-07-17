@@ -8,11 +8,11 @@ on:
         value: ${{ jobs.update.outputs.success }}
 
 jobs:
-  build:
+  update:
     name: Update
     runs-on: ubuntu-latest
     outputs:
-      success: ${{ steps.build.outputs.success }}
+      success: ${{ steps.update.outputs.success }}
     steps:
       - name: Update
         id: update

@@ -117,16 +117,9 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: gh release edit "${{ needs.release.outputs.tag }}" --draft=false
 
-  cleanup:
-    name: Cleanup On Fail
-    needs: [release, full_build, part_build]
-    if: |
-      always() &&
-      contains(needs.*.result, 'failure')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Delete Draft
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: gh release delete "${{ needs.release.outputs.tag }}" -y
+      - name: Cleanup Drafts
+        run: |
+          draft_releases=$(gh release list  --json tagName,createdAt,isDraft --jq '.[] | select(.isDraft)')
+          echo "$draft_releases" | jq '.tagName' | while read -r tag; do 
+            gh release delete "$tag" -y
+          done
