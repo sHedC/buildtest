@@ -125,7 +125,6 @@ jobs:
           draft_releases=$(gh release list  --json tagName,createdAt,isDraft --jq '.[] | select(.isDraft)')
           echo "$draft_releases" | jq '.tagName' | while read -r tag; do
             if [[ "$tag" != "" ]]; then
-              echo "Deleting $tag"
-              gh release delete "test" -y
+                gh release delete $(echo "$tag" | tr -d '"') -y
             fi
           done
