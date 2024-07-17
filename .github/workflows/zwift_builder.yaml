@@ -92,7 +92,7 @@ jobs:
           last_tag="${{ needs.prepare.outputs.last_tag }}"
           tag="${{ steps.tag.outputs.tag }}"
           type="${{ needs.prepare.outputs.build_type }}"
-          gh release create --draft "$tag" --title "$type" --generate-notes --notes-start-tag "$last_tag"
+          gh release create --draft "$tag" --title "$type" --generate-notes --notes-start-tag $last_tag
 
 
   full_build:
@@ -100,7 +100,7 @@ jobs:
     needs: [prepare, release]
     if: needs.prepare.outputs.build_type == 'Rebuild'
     uses: ./.github/workflows/zwift_full_build.yaml
-    
+
   part_build:
     name: Incremental Docker
     needs: [prepare, release]
