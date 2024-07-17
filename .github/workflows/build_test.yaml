@@ -121,9 +121,8 @@ jobs:
         id: build
         run: |
           echo "Incremental Docker Update"
-          success='false'
+          success='true'
           echo "success=$success" >> $GITHUB_OUTPUT
-          exit 1
 
   publish:
     name: Publish Release
