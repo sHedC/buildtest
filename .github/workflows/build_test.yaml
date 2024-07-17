@@ -81,6 +81,8 @@ jobs:
         run: echo "Build Not Needed"
 
   generate_release:
+    name: "Generate Release"
+    permissions: write-all
     runs-on: ubuntu-22.04
     needs: [part_build, full_build]
     if: |
