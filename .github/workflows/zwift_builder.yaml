@@ -94,15 +94,14 @@ jobs:
           type="${{ needs.prepare.outputs.build_type }}"
           gh release create --draft "$tag" --title "$type" --generate-notes --notes-start-tag $last_tag
 
-
   full_build:
-    name: Rebuild Docker
+    name: Docker
     needs: [prepare, release]
     if: needs.prepare.outputs.build_type == 'Rebuild'
     uses: ./.github/workflows/zwift_full_build.yaml
 
   part_build:
-    name: Update Docker
+    name: Docker
     needs: [prepare, release]
     if: needs.prepare.outputs.build_type == 'Incremental'
     uses: ./.github/workflows/zwift_part_build.yaml

@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Update Docker
+    name: Update
     runs-on: ubuntu-latest
     outputs:
       success: ${{ steps.build.outputs.success }}
