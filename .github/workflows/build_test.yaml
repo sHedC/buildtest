@@ -27,7 +27,7 @@ jobs:
       - name: Get Latest Tag
         id: latest_tag
         run: |
-          LATEST_TAG=$(git tag --sort -v:creatordate | grep v | tail -1)
+          LATEST_TAG=$(git tag --sort v:creatordate | grep v | tail -1)
           echo "value=$LATEST_TAG" >> $GITHUB_OUTPUT
 
       - name: Get Changes
