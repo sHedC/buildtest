@@ -29,12 +29,12 @@ jobs:
           echo "value=$LATEST_TAG" >> $GITHUB_OUTPUT
 
       - name: Get Changes
-        if: ${{steps.latest_tag.outputs.value != ''}}
+        if: steps.latest_tag.outputs.value != ''
         id: changes
         uses: tj-actions/changed-files@v44
         with:
           base_sha: HEAD
-          sha: ${{steps.latest-tag.outputs.value}}
+          sha: ${{steps.latest_tag.outputs.value}}
           files_yaml: |
             full:
               - buildAll.txt
@@ -47,13 +47,13 @@ jobs:
           BUILD_TYPE='None'
           SHOULD_BUILD='false'
 
-          if [[ ${{steps.latest-tag.outputs.value}} == '' ]]; then
+          if [[ ${{steps.latest_tag.outputs.value}} == '' ]]; then
             BUILD_TYPE='Rebuild'
             SHOULD_BUILD='true'
-          elif [[ ${{steps.changed-files.outputs.full_any_changed}} == 'true' ]]; then
+          elif [[ ${{steps.changes.outputs.full_any_changed}} == 'true' ]]; then
             BUILD_TYPE='Rebuild'
             SHOULD_BUILD='true'
-          elif [[ ${{steps.changed-files.outputs.part_any_changed}} == 'true' ]]; then
+          elif [[ ${{steps.changes.outputs.part_any_changed}} == 'true' ]]; then
             BUILD_TYPE='Incremental'
             SHOULD_BUILD='true'
           fi
