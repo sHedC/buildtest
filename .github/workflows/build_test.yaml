@@ -15,6 +15,7 @@ jobs:
     name: Check If Build Is Needed
     runs-on: ubuntu-latest
     outputs:
+      last_tag: ${{ steps.latest_tag.outputs.value }}
       should_build: ${{ steps.check_commit.outputs.build }}
       build_type: ${{ steps.check_commit.outputs.build_type }}
 
@@ -87,9 +88,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
+          last_tag="${{ needs.prepare.outputs.last_tag }}"
           tag="${{ steps.tag.outputs.tag }}"
           type="${{ needs.prepare.outputs.build_type }}"
-          gh release create --draft "$tag" --title "$tag - $type" --generate-notes
+          gh release create --draft "$tag" --title "$type" --generate-notes --notes-start-tag "$last_tag"
 
 
   full_build:
