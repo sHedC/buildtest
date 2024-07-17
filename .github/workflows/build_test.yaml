@@ -57,32 +57,36 @@ jobs:
           echo "value=$BUILD_TYPE" >> $GITHUB_OUTPUT
 
   full_build:
-    needs: build_type
     runs-on: ubuntu-22.04
+    needs: build_type
     if: ${{needs.build_type.outputs.value == 'FULL'}}
     steps:
       - name: "Full Build"
         run: echo "Full Build"
 
   part_build:
-    needs: build_type
     runs-on: ubuntu-22.04
+    needs: build_type
     if: ${{needs.build_type.outputs.value == 'PART'}}
     steps:
       - name: "Partial Build"
         run: echo "Part Build"
 
   build_not_required:
-    needs: build_type
     runs-on: ubuntu-22.04
+    needs: build_type
     if: ${{needs.build_type.outputs.value == 'NONE'}}
     steps:
       - name: "Nothing to Do"
         run: echo "Build Not Needed"
 
   generate_release:
-    needs: [part_build, full_build]
     runs-on: ubuntu-22.04
+    needs: [part_build, full_build]
+    if: |
+      always()
+      && contains(needs.*.result, 'success')
+      && !contains(needs.*.result, 'faillure')
     steps:
       - name: "Create Release"
         run: |
