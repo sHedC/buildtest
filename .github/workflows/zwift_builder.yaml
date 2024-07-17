@@ -7,17 +7,20 @@ on:
   pull_request:
     branches:
       - 'main'
+  workflow_dispatch:
+    inputs:
+      runner:
+        required: false
+        description: 'Runner Name'
+        default: 'ubuntu-latest'
 
 permissions: write-all
 concurrency: zwift
 
-env:
-  RUNNER: ubuntu-latest
-
 jobs:
   prepare:
     name: Check If Build Is Needed
-    runs-on: $RUNNER
+    runs-on: "${{ inputs.runner }}"
     outputs:
       last_tag: ${{ steps.latest_tag.outputs.value }}
       should_build: ${{ steps.check_commit.outputs.build }}
