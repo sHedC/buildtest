@@ -75,7 +75,7 @@ jobs:
     name: Create GitHub Release
     needs: prepare
     if: needs.prepare.outputs.should_build == 'true'
-    runs-on: $RUNNER
+    runs-on: "${{ inputs.runner }}"
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
@@ -105,7 +105,7 @@ jobs:
     name: Rebuild Docker
     needs: [prepare, release]
     if: needs.prepare.outputs.build_type == 'Rebuild'
-    runs-on: $RUNNER
+    runs-on: "${{ inputs.runner }}"
     outputs:
       success: ${{ steps.build.outputs.success }}
     steps:
@@ -120,7 +120,7 @@ jobs:
     name: Incremental Docker
     needs: [prepare, release]
     if: needs.prepare.outputs.build_type == 'Incremental'
-    runs-on: $RUNNER
+    runs-on: "${{ inputs.runner }}"
     outputs:
       success: ${{ steps.build.outputs.success }}
     steps:
@@ -137,7 +137,7 @@ jobs:
     if: |
       always() &&
       (needs.part_build.outputs.success == 'true' || needs.full_build.outputs.success == 'true')
-    runs-on: $RUNNER
+    runs-on: "${{ inputs.runner }}"
     steps:
       - name: Publish Release
         env:
@@ -151,7 +151,7 @@ jobs:
     if: |
       always() &&
       contains(needs.*.result, 'failure')
-    runs-on: $RUNNER
+    runs-on: "${{ inputs.runner }}"
     steps:
       - name: Delete Draft
         env:
