@@ -2,6 +2,10 @@ name: Full Docker Build
 
 on:
   workflow_call:
+    outputs:
+      success:
+        description: Success Status of Build
+        value: ${{ jobs.build.outputs.success }}
 
 jobs:
   build:
