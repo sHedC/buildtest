@@ -147,9 +147,9 @@ jobs:
         run: gh release edit "${{ needs.release.outputs.tag }}" --draft=false
       
       - name: Cleanup
-        uses: eregon/keep-last-n-releases@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: sgpublic/delete-release-action@v1.1
         with:
-          n: 3
-          remove_tags_without_release: true
+          draft-drop: true
+          draft-drop-count: -1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
